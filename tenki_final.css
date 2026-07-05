@@ -1,108 +1,144 @@
-:root {
-  --color-bg: #eef5fb;
-  --color-card: #ffffff;
-  --color-primary: #2b6cb0;
-  --color-primary-dark: #1a4971;
-  --color-text: #24303c;
-  --color-muted: #6b7785;
-  --color-border: #d8e3ee;
-  --radius: 10px;
-}
-
+/* ===== 天気予報アプリ：ソフト系デザイン ===== */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 16px;
   font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: linear-gradient(160deg, #6db3f2 0%, #1e69de 100%);
+  color: #1a2330;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px;
+}
+
+.app {
+  width: 100%;
+  max-width: 560px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
 }
 
 .app-header {
-  max-width: 720px;
-  margin: 0 auto 16px;
   text-align: center;
+  margin-bottom: 18px;
 }
 
 .app-header h1 {
-  margin: 0 0 4px;
-  font-size: 1.6rem;
-  color: var(--color-primary-dark);
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
 }
 
 .clock {
-  font-size: 2rem;
-  font-weight: bold;
+  margin-top: 6px;
+  font-size: 1.6rem;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
-  margin: 0;
-  color: var(--color-primary);
+  font-weight: bold;
+  color: #1e69de;
 }
 
-.location-panel {
-  max-width: 720px;
-  margin: 0 auto 20px;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 16px;
+/* ===== 地点ボタン ===== */
+.locations {
+  margin-bottom: 20px;
 }
 
-.location-row {
+.location-buttons {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 8px;
+  margin-bottom: 12px;
+}
+
+.loc-btn {
+  position: relative;
+  border: 1px solid #b9d4f2;
+  background: #fff;
+  color: #1e69de;
+  border-radius: 999px;
+  padding: 7px 30px 7px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.loc-btn:hover {
+  background: #eaf3ff;
+}
+
+.loc-btn.active {
+  background: #1e69de;
+  color: #fff;
+  border-color: #1e69de;
+}
+
+.loc-btn .remove {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.loc-btn .remove:hover {
+  opacity: 1;
+}
+
+/* ===== 追加フォーム（地名検索） ===== */
+.add-form {
   margin-bottom: 10px;
 }
 
-.location-row label {
+.add-form summary {
+  cursor: pointer;
   font-size: 0.9rem;
-  color: var(--color-muted);
+  color: #1e69de;
+  user-select: none;
 }
 
-select,
-input[type="text"] {
-  padding: 6px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  font-size: 0.95rem;
+#add-location-form {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  background: #f3f8ff;
+  padding: 14px;
+  border-radius: 12px;
 }
 
-input[type="text"] {
+#add-location-form input {
   flex: 1;
-  min-width: 140px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #cdddef;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: var(--color-primary);
+#add-location-form button {
+  background: #1e69de;
   color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
   font-size: 0.9rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-button:hover {
-  background: var(--color-primary-dark);
-}
-
-#delete-location-btn {
-  background: #b0413e;
-}
-
-#delete-location-btn:hover {
-  background: #8a2f2d;
+#add-location-form button:hover {
+  background: #1857bb;
 }
 
 .search-results {
   list-style: none;
-  margin: 0 0 10px;
-  padding: 0;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -111,74 +147,161 @@ button:hover {
 .search-results li button {
   width: 100%;
   text-align: left;
-  background: #f2f7fc;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: #fff;
+  color: #1a2330;
+  border: 1px solid #e2ecf7;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
 }
 
 .search-results li button:hover {
-  background: #dfeaf6;
+  background: #eaf3ff;
+  border-color: #b9d4f2;
+}
+
+/* ===== 現在地ボタン ===== */
+.geo-btn {
+  display: block;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #b9d4f2;
+  color: #1e69de;
+  border-radius: 999px;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.geo-btn:hover {
+  background: #1e69de;
+  color: #fff;
 }
 
 .status-message {
   min-height: 1.2em;
-  font-size: 0.9rem;
-  color: var(--color-muted);
-  margin: 0;
-}
-
-.forecast-table {
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  border-collapse: collapse;
-  background: var(--color-card);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-.forecast-table th,
-.forecast-table td {
-  padding: 10px 8px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: #56657a;
   text-align: center;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.95rem;
 }
 
-.forecast-table th {
-  background: var(--color-primary);
-  color: #fff;
-  font-weight: normal;
+/* ===== 現在の天気 ===== */
+.current {
+  text-align: center;
+  background: #f3f8ff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
-.forecast-table td:first-child {
-  text-align: left;
-  color: var(--color-muted);
-  white-space: nowrap;
+.location-name {
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
-.weather-cell {
-  font-size: 1.4rem;
+.current-emoji {
+  font-size: 4rem;
+  line-height: 1.2;
 }
 
-.weather-cell .weather-label {
-  display: block;
+.current-temp {
+  font-size: 2.6rem;
+  font-weight: bold;
+}
+
+.current-desc {
+  color: #56657a;
+}
+
+/* ===== 3日間の予報カード ===== */
+.forecast h2 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: #2b3a55;
+}
+
+.forecast-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.forecast-card {
+  background: #fff;
+  border: 1px solid #e2ecf7;
+  border-radius: 12px;
+  padding: 14px 6px;
+  text-align: center;
+}
+
+.forecast-card .day {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #2b3a55;
+}
+
+.forecast-card .emoji {
+  font-size: 1.8rem;
+  margin: 6px 0 2px;
+}
+
+.forecast-card .weather-label {
+  font-size: 0.72rem;
+  color: #56657a;
+  margin-bottom: 6px;
+}
+
+.forecast-card .temps {
+  font-size: 0.9rem;
+}
+
+.forecast-card .temp-max {
+  color: #e7503a;
+  font-weight: bold;
+}
+
+.forecast-card .temp-min {
+  color: #1e69de;
+}
+
+.forecast-card .pop {
   font-size: 0.75rem;
-  color: var(--color-muted);
+  color: #56657a;
+  margin-top: 6px;
+}
+
+.forecast-card .wind {
+  font-size: 0.75rem;
+  color: #56657a;
   margin-top: 2px;
 }
 
+/* 降水確率が高い日は赤く強調 */
+.forecast-card.rainy {
+  background: #fff3f1;
+  border-color: #f3b6ac;
+}
+
+.forecast-card.rainy .pop {
+  color: #e7503a;
+  font-weight: bold;
+}
+
+/* ===== ページ内リンク・フッター ===== */
 .page-nav {
-  max-width: 720px;
-  margin: 16px auto;
+  margin-top: 20px;
   text-align: center;
 }
 
 .page-nav a {
-  color: var(--color-primary);
+  color: #1e69de;
   text-decoration: none;
   font-weight: bold;
+  font-size: 0.9rem;
 }
 
 .page-nav a:hover {
@@ -186,56 +309,61 @@ button:hover {
 }
 
 .app-footer {
-  max-width: 720px;
-  margin: 24px auto 0;
+  margin-top: 16px;
   text-align: center;
-  font-size: 0.8rem;
-  color: var(--color-muted);
+  font-size: 0.72rem;
+  color: #56657a;
 }
 
 .app-footer a {
-  color: var(--color-muted);
+  color: #1e69de;
 }
 
+/* ===== 24時間天気ページ（テーブル） ===== */
 .hourly-table-wrap {
-  max-width: 720px;
-  margin: 0 auto;
   overflow-x: auto;
-  background: var(--color-card);
-  border-radius: var(--radius);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  border: 1px solid #e2ecf7;
+  margin-bottom: 8px;
 }
 
 .hourly-table {
   width: 100%;
   border-collapse: collapse;
   min-width: 480px;
+  background: #fff;
 }
 
 .hourly-table th,
 .hourly-table td {
-  padding: 8px 6px;
+  padding: 9px 8px;
   text-align: center;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.9rem;
+  border-bottom: 1px solid #eef3fa;
+  font-size: 0.85rem;
   white-space: nowrap;
 }
 
 .hourly-table th {
-  background: var(--color-primary);
+  background: #1e69de;
   color: #fff;
   font-weight: normal;
   position: sticky;
   top: 0;
 }
 
+.hourly-table tbody tr:hover {
+  background: #f3f8ff;
+}
+
 @media (max-width: 480px) {
-  .clock {
-    font-size: 1.6rem;
+  .forecast-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
-  .forecast-table th,
-  .forecast-table td {
-    font-size: 0.8rem;
-    padding: 8px 4px;
+  .forecast-card {
+    padding: 10px 4px;
+  }
+  .clock {
+    font-size: 1.3rem;
   }
 }

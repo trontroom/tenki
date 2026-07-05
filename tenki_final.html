@@ -7,89 +7,55 @@
 <link rel="stylesheet" href="tenki_final.css">
 </head>
 <body>
-  <header class="app-header">
-    <h1>天気予報</h1>
-    <p id="clock" class="clock">--:--:--</p>
-  </header>
+  <div class="app">
+    <header class="app-header">
+      <h1>🌤️ 天気予報</h1>
+      <p id="clock" class="clock">--:--:--</p>
+    </header>
 
-  <section class="location-panel">
-    <div class="location-row">
-      <label for="location-select">表示する地点</label>
-      <select id="location-select"></select>
-      <button id="delete-location-btn" type="button" title="選択中の地点を削除">削除</button>
-    </div>
+    <!-- 地点管理 -->
+    <section class="locations">
+      <div class="location-buttons" id="location-buttons">
+        <!-- JavaScript が地点ボタンを並べます -->
+      </div>
 
-    <form id="add-location-form" class="location-row">
-      <input type="text" id="location-input" placeholder="地名を入力（例: 大阪）" autocomplete="off">
-      <button type="submit">地点を追加</button>
-    </form>
+      <details class="add-form">
+        <summary>＋ 地点を検索して追加</summary>
+        <form id="add-location-form">
+          <input type="text" id="location-input" placeholder="地名を入力（例: 大阪）" autocomplete="off">
+          <button type="submit">検索</button>
+        </form>
+        <ul id="search-results" class="search-results"></ul>
+      </details>
 
-    <ul id="search-results" class="search-results"></ul>
+      <button id="geolocation-btn" class="geo-btn" type="button">📍 現在地の天気を表示</button>
 
-    <div class="location-row">
-      <button id="geolocation-btn" type="button">📍 現在地の天気を表示</button>
-    </div>
+      <p id="status-message" class="status-message" role="status"></p>
+    </section>
 
-    <p id="status-message" class="status-message" role="status"></p>
-  </section>
+    <!-- 現在の天気 -->
+    <section class="current" id="current">
+      <p class="location-name" id="current-name">--</p>
+      <p class="current-emoji" id="current-emoji">⏳</p>
+      <p class="current-temp" id="current-temp">--℃</p>
+      <p class="current-desc" id="current-desc">読み込み中...</p>
+    </section>
 
-  <table id="forecast-table" class="forecast-table">
-    <thead>
-      <tr>
-        <th>項目</th>
-        <th id="day0-label">今日</th>
-        <th id="day1-label">明日</th>
-        <th id="day2-label">明後日</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>天気</td>
-        <td id="day0-weather" class="weather-cell"></td>
-        <td id="day1-weather" class="weather-cell"></td>
-        <td id="day2-weather" class="weather-cell"></td>
-      </tr>
-      <tr>
-        <td>最高気温</td>
-        <td id="day0-tmax"></td>
-        <td id="day1-tmax"></td>
-        <td id="day2-tmax"></td>
-      </tr>
-      <tr>
-        <td>最低気温</td>
-        <td id="day0-tmin"></td>
-        <td id="day1-tmin"></td>
-        <td id="day2-tmin"></td>
-      </tr>
-      <tr>
-        <td>降水量</td>
-        <td id="day0-precip"></td>
-        <td id="day1-precip"></td>
-        <td id="day2-precip"></td>
-      </tr>
-      <tr>
-        <td>降水確率</td>
-        <td id="day0-pop"></td>
-        <td id="day1-pop"></td>
-        <td id="day2-pop"></td>
-      </tr>
-      <tr>
-        <td>最大風速</td>
-        <td id="day0-wind"></td>
-        <td id="day1-wind"></td>
-        <td id="day2-wind"></td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- 3日間の予報 -->
+    <section class="forecast">
+      <h2>今日・明日・明後日の予報</h2>
+      <div class="forecast-list" id="forecast-list"></div>
+    </section>
 
-  <nav class="page-nav">
-    <a href="tenki_hourly.html">24時間天気を見る &rarr;</a>
-  </nav>
+    <nav class="page-nav">
+      <a href="tenki_hourly.html">24時間天気を見る &rarr;</a>
+    </nav>
 
-  <footer class="app-footer">
-    <p>気象データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> /
-       地点検索: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap Nominatim</a></p>
-  </footer>
+    <footer class="app-footer">
+      <p>気象データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> /
+         地点検索: <a href="https://nominatim.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap Nominatim</a></p>
+    </footer>
+  </div>
 
   <script src="weather-common.js"></script>
   <script src="tenki_final.js"></script>

@@ -1,13 +1,15 @@
-// メインページ（3日間の天気予報・地点管理・時計）のロジック
+// メインページ（現在の天気 + 3日間予報・地点管理・時計）のロジック
 
 function showStatus(message) {
   document.getElementById('status-message').textContent = message;
 }
 
-async function fetchForecast(lat, lon) {
+// 現在の天気(current) + 3日間の日別予報(daily)を1回のリクエストで取得
+async function fetchWeather(lat, lon) {
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lon,
+    current: ['temperature_2m', 'weather_code'].join(','),
     daily: [
       'weather_code',
       'temperature_2m_max',
@@ -23,59 +25,83 @@ async function fetchForecast(lat, lon) {
   if (!res.ok) {
     throw new Error('天気データの取得に失敗しました');
   }
-  const data = await res.json();
-  return data.daily;
+  return res.json();
 }
 
+// ===== 現在の天気を表示 =====
+function renderCurrent(name, current) {
+  const info = weatherCodeToInfo(current.weather_code);
+  document.getElementById('current-name').textContent = name;
+  document.getElementById('current-emoji').textContent = info.emoji;
+  document.getElementById('current-temp').textContent = `${Math.round(current.temperature_2m)}℃`;
+  document.getElementById('current-desc').textContent = info.label;
+}
+
+// ===== 3日間の予報カードを表示 =====
 function renderForecast(daily) {
   const offsetLabels = ['今日', '明日', '明後日'];
+  const list = document.getElementById('forecast-list');
+  list.innerHTML = '';
 
   for (let i = 0; i < 3; i++) {
     const date = new Date(`${daily.time[i]}T00:00:00`);
     const weekday = WEEKDAY_NAMES[date.getDay()];
-    document.getElementById(`day${i}-label`).textContent = `${offsetLabels[i]}（${weekday}）`;
-
     const info = weatherCodeToInfo(daily.weather_code[i]);
-    const weatherCell = document.getElementById(`day${i}-weather`);
-    weatherCell.innerHTML = '';
-    const emojiSpan = document.createElement('span');
-    emojiSpan.textContent = info.emoji;
-    const labelSpan = document.createElement('span');
-    labelSpan.className = 'weather-label';
-    labelSpan.textContent = info.label;
-    weatherCell.append(emojiSpan, labelSpan);
+    const max = Math.round(daily.temperature_2m_max[i]);
+    const min = Math.round(daily.temperature_2m_min[i]);
+    const precip = daily.precipitation_sum[i];
+    const pop = daily.precipitation_probability_max[i];
+    const wind = Math.round(daily.wind_speed_10m_max[i]);
 
-    document.getElementById(`day${i}-tmax`).textContent = `${Math.round(daily.temperature_2m_max[i])}°C`;
-    document.getElementById(`day${i}-tmin`).textContent = `${Math.round(daily.temperature_2m_min[i])}°C`;
-    document.getElementById(`day${i}-precip`).textContent = `${daily.precipitation_sum[i]} mm`;
-    document.getElementById(`day${i}-pop`).textContent = `${daily.precipitation_probability_max[i]} %`;
-    document.getElementById(`day${i}-wind`).textContent = `${Math.round(daily.wind_speed_10m_max[i])} km/h`;
+    const card = document.createElement('div');
+    card.className = 'forecast-card' + (pop >= 50 ? ' rainy' : '');
+    card.innerHTML = `
+      <p class="day">${offsetLabels[i]}（${weekday}）</p>
+      <p class="emoji">${info.emoji}</p>
+      <p class="weather-label">${info.label}</p>
+      <p class="temps"><span class="temp-max">${max}°</span> / <span class="temp-min">${min}°</span></p>
+      <p class="pop">☂ ${pop}%（${precip}mm）</p>
+      <p class="wind">💨 ${wind}km/h</p>
+    `;
+    list.appendChild(card);
   }
 }
 
 async function loadAndRenderWeather(location) {
   showStatus(`${location.name} の天気を取得中...`);
   try {
-    const daily = await fetchForecast(location.lat, location.lon);
-    renderForecast(daily);
+    const data = await fetchWeather(location.lat, location.lon);
+    renderCurrent(location.name, data.current);
+    renderForecast(data.daily);
     showStatus(`${location.name} の天気を表示しています。`);
   } catch (err) {
     showStatus('天気データの取得に失敗しました。しばらくしてから再度お試しください。');
   }
 }
 
-function renderLocationSelect(locations, selectedName) {
-  const select = document.getElementById('location-select');
-  select.innerHTML = '';
+// ===== 地点ピルボタンの描画 =====
+function renderLocationButtons(locations, selectedName) {
+  const container = document.getElementById('location-buttons');
+  container.innerHTML = '';
+
   locations.forEach((loc) => {
-    const opt = document.createElement('option');
-    opt.value = loc.name;
-    opt.textContent = loc.name;
-    select.appendChild(opt);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'loc-btn' + (loc.name === selectedName ? ' active' : '');
+    btn.textContent = loc.name;
+    btn.addEventListener('click', () => selectLocation(loc.name));
+
+    const remove = document.createElement('span');
+    remove.className = 'remove';
+    remove.textContent = '×';
+    remove.addEventListener('click', (event) => {
+      event.stopPropagation();
+      deleteLocation(loc.name);
+    });
+
+    btn.appendChild(remove);
+    container.appendChild(btn);
   });
-  if (selectedName) {
-    select.value = selectedName;
-  }
 }
 
 function selectLocation(name) {
@@ -83,7 +109,7 @@ function selectLocation(name) {
   const location = locations.find((l) => l.name === name);
   if (!location) return;
   setSelectedLocationName(name);
-  document.getElementById('location-select').value = name;
+  renderLocationButtons(locations, name);
   loadAndRenderWeather(location);
 }
 
@@ -92,31 +118,36 @@ function addLocation(location) {
   const exists = locations.some((l) => l.name === location.name);
   if (exists) {
     showStatus(`「${location.name}」はすでに登録されています。`);
-    renderLocationSelect(locations, location.name);
+    renderLocationButtons(locations, location.name);
     selectLocation(location.name);
     return;
   }
   const updated = [...locations, location];
   saveLocations(updated);
-  renderLocationSelect(updated, location.name);
+  renderLocationButtons(updated, location.name);
   selectLocation(location.name);
   showStatus(`「${location.name}」を追加しました。`);
 }
 
-function deleteSelectedLocation() {
+function deleteLocation(name) {
   const locations = loadLocations();
   if (locations.length <= 1) {
     showStatus('最後の1件は削除できません。');
     return;
   }
-  const name = document.getElementById('location-select').value;
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+
   const filtered = locations.filter((l) => l.name !== name);
   saveLocations(filtered);
-  renderLocationSelect(filtered, filtered[0].name);
-  selectLocation(filtered[0].name);
+
+  const currentSelected = getSelectedLocation();
+  const nextName = currentSelected.name === name ? filtered[0].name : currentSelected.name;
+  renderLocationButtons(filtered, nextName);
+  selectLocation(nextName);
   showStatus(`「${name}」を削除しました。`);
 }
 
+// ===== 地名検索（Nominatim） =====
 async function searchPlace(query) {
   const params = new URLSearchParams({
     format: 'json',
@@ -160,6 +191,7 @@ function renderSearchResults(results) {
       });
       ul.innerHTML = '';
       document.getElementById('location-input').value = '';
+      document.querySelector('.add-form').removeAttribute('open');
     });
     li.appendChild(button);
     ul.appendChild(li);
@@ -188,6 +220,7 @@ function handleAddLocationSubmit(event) {
     });
 }
 
+// ===== 現在地の天気（Geolocation API） =====
 function handleGeolocationClick() {
   if (!('geolocation' in navigator)) {
     showStatus('このブラウザは現在地取得に対応していません。');
@@ -204,7 +237,7 @@ function handleGeolocationClick() {
       const locations = loadLocations().filter((l) => l.name !== '現在地');
       const updated = [...locations, location];
       saveLocations(updated);
-      renderLocationSelect(updated, '現在地');
+      renderLocationButtons(updated, '現在地');
       selectLocation('現在地');
     },
     () => {
@@ -214,10 +247,11 @@ function handleGeolocationClick() {
   );
 }
 
+// ===== 時計：1秒ごとに更新 =====
 function updateClock() {
   const now = new Date();
-  const time = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
-  document.getElementById('clock').textContent = time;
+  document.getElementById('clock').textContent =
+    `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
 }
 
 function init() {
@@ -226,15 +260,14 @@ function init() {
 
   const locations = loadLocations();
   const selected = getSelectedLocation();
-  renderLocationSelect(locations, selected.name);
-  selectLocation(selected.name);
+  renderLocationButtons(locations, selected.name);
+  loadAndRenderWeather(selected);
 
-  document.getElementById('location-select').addEventListener('change', (event) => {
-    selectLocation(event.target.value);
-  });
-  document.getElementById('delete-location-btn').addEventListener('click', deleteSelectedLocation);
   document.getElementById('add-location-form').addEventListener('submit', handleAddLocationSubmit);
   document.getElementById('geolocation-btn').addEventListener('click', handleGeolocationClick);
+
+  // 1時間ごとに天気を再取得
+  setInterval(() => loadAndRenderWeather(getSelectedLocation()), 60 * 60 * 1000);
 }
 
 document.addEventListener('DOMContentLoaded', init);
