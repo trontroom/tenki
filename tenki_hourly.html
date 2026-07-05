@@ -7,35 +7,21 @@
 <link rel="stylesheet" href="tenki_final.css">
 </head>
 <body>
-  <header class="app-header">
-    <h1>24時間天気</h1>
-    <p id="location-name" class="clock" style="font-size:1.2rem;"></p>
-  </header>
+  <div class="app">
+    <header class="app-header">
+      <a href="tenki_final.html" class="back-link">&larr; 戻る</a>
+      <h1>24時間天気</h1>
+      <p id="location-name" class="hourly-location"></p>
+    </header>
 
-  <p id="status-message" class="status-message" role="status" style="text-align:center;"></p>
+    <p id="status-message" class="status-message" role="status"></p>
 
-  <div class="hourly-table-wrap">
-    <table class="hourly-table">
-      <thead>
-        <tr>
-          <th>時刻</th>
-          <th>天気</th>
-          <th>気温</th>
-          <th>降水量</th>
-          <th>降水確率</th>
-        </tr>
-      </thead>
-      <tbody id="hourly-body"></tbody>
-    </table>
+    <ul class="hourly-list" id="hourly-list"></ul>
+
+    <footer class="app-footer">
+      <p>気象データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
+    </footer>
   </div>
-
-  <nav class="page-nav">
-    <a href="tenki_final.html">&larr; 天気予報トップに戻る</a>
-  </nav>
-
-  <footer class="app-footer">
-    <p>気象データ: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
-  </footer>
 
   <script src="weather-common.js"></script>
   <script src="tenki_hourly.js"></script>

@@ -319,40 +319,111 @@ body {
   color: #1e69de;
 }
 
-/* ===== 24時間天気ページ（テーブル） ===== */
-.hourly-table-wrap {
-  overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid #e2ecf7;
-  margin-bottom: 8px;
-}
-
-.hourly-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 480px;
-  background: #fff;
-}
-
-.hourly-table th,
-.hourly-table td {
-  padding: 9px 8px;
-  text-align: center;
-  border-bottom: 1px solid #eef3fa;
+/* ===== 24時間天気ページ ===== */
+.back-link {
+  display: inline-block;
+  margin-bottom: 6px;
   font-size: 0.85rem;
+  color: #1e69de;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.hourly-location {
+  margin-top: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2b3a55;
+}
+
+.hourly-list {
+  list-style: none;
+}
+
+/* 日付の区切り */
+.hour-day-sep {
+  font-size: 0.78rem;
+  font-weight: bold;
+  color: #8a97ad;
+  margin: 14px 0 6px;
+  padding-left: 4px;
+}
+
+.hour-day-sep:first-child {
+  margin-top: 0;
+}
+
+/* 1時間ごとの行 */
+.hour-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 12px;
+}
+
+.hour-row:nth-child(even) {
+  background: #f6f9fd;
+}
+
+/* 直近の時刻を強調 */
+.hour-row.now {
+  background: #eaf3ff;
+  box-shadow: inset 0 0 0 1.5px #b9d4f2;
+}
+
+.hour-time {
+  width: 44px;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: #56657a;
+}
+
+.hour-emoji {
+  font-size: 1.4rem;
+  width: 28px;
+  text-align: center;
+}
+
+.hour-temp {
+  width: 42px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #24303c;
+}
+
+/* 降水確率バー + テキスト */
+.hour-rain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rain-bar {
+  flex: 1;
+  height: 6px;
+  background: #e2ecf7;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.rain-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #6db3f2, #1e69de);
+  border-radius: 999px;
+}
+
+.rain-text {
+  font-size: 0.75rem;
+  color: #56657a;
   white-space: nowrap;
-}
-
-.hourly-table th {
-  background: #1e69de;
-  color: #fff;
-  font-weight: normal;
-  position: sticky;
-  top: 0;
-}
-
-.hourly-table tbody tr:hover {
-  background: #f3f8ff;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 480px) {

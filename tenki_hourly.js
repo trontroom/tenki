@@ -17,44 +17,52 @@ async function fetchHourly(lat, lon) {
 }
 
 function renderHourly(hourly) {
-  const tbody = document.getElementById('hourly-body');
-  tbody.innerHTML = '';
+  const list = document.getElementById('hourly-list');
+  list.innerHTML = '';
 
   const now = new Date();
   let startIndex = hourly.time.findIndex((t) => new Date(t) >= now);
   if (startIndex === -1) startIndex = 0;
 
   const count = Math.min(24, hourly.time.length - startIndex);
+  let lastDate = '';
+
   for (let i = startIndex; i < startIndex + count; i++) {
     const date = new Date(hourly.time[i]);
-    const timeLabel = `${pad2(date.getMonth() + 1)}/${pad2(date.getDate())} ${pad2(date.getHours())}:00`;
+    const dateKey = `${date.getMonth() + 1}/${date.getDate()}`;
+
+    // 日付が変わったら区切りを入れる
+    if (dateKey !== lastDate) {
+      const sep = document.createElement('li');
+      sep.className = 'hour-day-sep';
+      sep.textContent = `${dateKey}（${WEEKDAY_NAMES[date.getDay()]}）`;
+      list.appendChild(sep);
+      lastDate = dateKey;
+    }
+
     const info = weatherCodeToInfo(hourly.weather_code[i]);
+    const temp = Math.round(hourly.temperature_2m[i]);
+    const precip = hourly.precipitation[i];
+    const pop = hourly.precipitation_probability[i];
 
-    const tr = document.createElement('tr');
-
-    const tdTime = document.createElement('td');
-    tdTime.textContent = timeLabel;
-
-    const tdWeather = document.createElement('td');
-    tdWeather.textContent = `${info.emoji} ${info.label}`;
-
-    const tdTemp = document.createElement('td');
-    tdTemp.textContent = `${Math.round(hourly.temperature_2m[i])}°C`;
-
-    const tdPrecip = document.createElement('td');
-    tdPrecip.textContent = `${hourly.precipitation[i]} mm`;
-
-    const tdPop = document.createElement('td');
-    tdPop.textContent = `${hourly.precipitation_probability[i]} %`;
-
-    tr.append(tdTime, tdWeather, tdTemp, tdPrecip, tdPop);
-    tbody.appendChild(tr);
+    const li = document.createElement('li');
+    li.className = 'hour-row' + (i === startIndex ? ' now' : '');
+    li.innerHTML = `
+      <span class="hour-time">${date.getHours()}時</span>
+      <span class="hour-emoji">${info.emoji}</span>
+      <span class="hour-temp">${temp}°</span>
+      <span class="hour-rain">
+        <span class="rain-bar"><span class="rain-fill" style="width:${pop}%"></span></span>
+        <span class="rain-text">${pop}% ・ ${precip}mm</span>
+      </span>
+    `;
+    list.appendChild(li);
   }
 }
 
 async function init() {
   const location = getSelectedLocation();
-  document.getElementById('location-name').textContent = `${location.name} の24時間天気`;
+  document.getElementById('location-name').textContent = location.name;
   const statusEl = document.getElementById('status-message');
   statusEl.textContent = '読み込み中...';
   try {
